@@ -367,36 +367,38 @@
       pdfjsLib.GlobalWorkerOptions.workerSrc =
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
 
-      // Load the PDF
-      const pdfSlug = window.location.pathname.split("/").slice(1).join("/");
+      function main() {
+        // Load the PDF
+        const pdfSlug = window.location.pathname.split("/").slice(1).join("/");
 
-      if (pdfSlug == "") {
-        document.getElementById("pdf-loader").remove();
-        document.getElementById("message").textContent = "No PDF specified.";
-        return;
-      }
+        if (pdfSlug == "") {
+          document.getElementById("pdf-loader").remove();
+          document.getElementById("message").textContent = "No PDF specified.";
+          return;
+        }
 
-      const url = baseUrl + pdfSlug + ".pdf";
-      pdfjsLib
-        .getDocument(url)
-        .promise.then(function (pdf) {
-          pdfDoc = pdf;
-          pdfDoc.getMetadata().then(function (metadata) {
-            if (metadata?.info?.Title) {
-              document.title = "ekko | " + metadata.info.Title;
-            }
+        const url = baseUrl + pdfSlug + ".pdf";
+        pdfjsLib
+          .getDocument(url)
+          .promise.then(function (pdf) {
+            pdfDoc = pdf;
+            pdfDoc.getMetadata().then(function (metadata) {
+              if (metadata?.info?.Title) {
+                document.title = "ekko | " + metadata.info.Title;
+              }
+            });
+            document.getElementById("total-pages").textContent = pdf.numPages;
+            renderPage(currentPage);
+            document.getElementById("pdf-dialog")?.remove();
+          })
+          .catch(function (error) {
+            console.error("PDF error:", error);
+            document.getElementById("message").textContent = error.message;
+          })
+          .finally(() => {
+            document.getElementById("pdf-loader")?.remove();
           });
-          document.getElementById("total-pages").textContent = pdf.numPages;
-          renderPage(currentPage);
-          document.getElementById("pdf-dialog")?.remove();
-        })
-        .catch(function (error) {
-          console.error("PDF error:", error);
-          document.getElementById("message").textContent = error.message;
-        })
-        .finally(() => {
-          document.getElementById("pdf-loader")?.remove();
-        });
+      }
 
       // Render a specific page
       function renderPage(pageNum) {
@@ -573,6 +575,7 @@
       detectTouch();
 
       // :)
+      main();
       console.log(
         "%c✨ Ekko %c- Documents amplified",
         "color: #2aa8a8; font-size: 20px; font-weight: bold;",
