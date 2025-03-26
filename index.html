@@ -368,8 +368,14 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
 
       // Load the PDF
-      //const pdfSlug = window.location.pathname.split("/").slice(1).join("/");
-      const pdfSlug = "fp-growth";
+      const pdfSlug = window.location.pathname.split("/").slice(1).join("/");
+
+      if (pdfSlug == "") {
+        document.getElementById("pdf-loader").remove();
+        document.getElementById("message").textContent = "No PDF specified.";
+        return;
+      }
+
       const url = baseUrl + pdfSlug + ".pdf";
       pdfjsLib
         .getDocument(url)
